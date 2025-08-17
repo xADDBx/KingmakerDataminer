@@ -70,15 +70,18 @@ namespace CustomBlueprints
                 DateFormatHandling = DateFormatHandling.IsoDateFormat,
                 DateParseHandling = DateParseHandling.DateTime,
                 DateTimeZoneHandling = DateTimeZoneHandling.RoundtripKind,
-                DefaultValueHandling = DefaultValueHandling.Ignore,
+                // Keep default values in json
+                DefaultValueHandling = DefaultValueHandling.Include,
                 FloatFormatHandling = FloatFormatHandling.String,
                 FloatParseHandling = FloatParseHandling.Double,
                 Formatting = Formatting.Indented,
                 MetadataPropertyHandling = MetadataPropertyHandling.ReadAhead,
                 MissingMemberHandling = MissingMemberHandling.Ignore,
-                NullValueHandling = NullValueHandling.Ignore,
+                // Keep default values in json
+                NullValueHandling = NullValueHandling.Include,
                 ObjectCreationHandling = ObjectCreationHandling.Replace,
-                PreserveReferencesHandling = PreserveReferencesHandling.Objects,
+                // Don't want $id fields
+                PreserveReferencesHandling = PreserveReferencesHandling.None,
                 ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
                 StringEscapeHandling = StringEscapeHandling.Default,
                 TypeNameAssemblyFormat = FormatterAssemblyStyle.Simple,
@@ -120,7 +123,7 @@ namespace CustomBlueprints
         {
             var folder = Path.GetDirectoryName(path);
             if (!string.IsNullOrEmpty(folder)) Directory.CreateDirectory(folder);
-            if(settings == null) settings = CreateSettings();
+            if (settings == null) settings = CreateSettings();
             JsonSerializer serializer = JsonSerializer.Create(settings);
             using (StreamWriter sw = new StreamWriter(path))
             using (JsonWriter writer = new JsonTextWriter(sw))
@@ -143,8 +146,8 @@ namespace CustomBlueprints
         public static void DumpResource(object obj, string path, JsonSerializerSettings settings = null)
         {
             var folder = Path.GetDirectoryName(path);
-            if(!string.IsNullOrEmpty(folder)) Directory.CreateDirectory(folder);
-            if(settings == null) settings = CreateSettings();
+            if (!string.IsNullOrEmpty(folder)) Directory.CreateDirectory(folder);
+            if (settings == null) settings = CreateSettings();
             settings.Error = HandleDeserializationError;
             var contractResolver = settings.ContractResolver as BlueprintContractResolver;
             contractResolver.PreferredConverters.Insert(0, new GameObjectConverter());
@@ -157,7 +160,7 @@ namespace CustomBlueprints
             }
         }
 
-        private static void HandleDeserializationError(object sender, 
+        private static void HandleDeserializationError(object sender,
             Newtonsoft.Json.Serialization.ErrorEventArgs e)
         {
             var currentError = e.ErrorContext.Error.Message;

@@ -12,12 +12,19 @@ namespace CustomBlueprints
         public override void WriteJson(JsonWriter w, object o, JsonSerializer szr)
         {
             var ls = (LocalizedString)o;
-            for(int i = 0; i < 50 && ls.Shared != null; i++)
+            for (int i = 0; i < 50 && ls.Shared != null; i++)
             {
                 ls = ls.Shared.String;
             }
             var text = LocalizationHelper.GetText(ls.Key);
-            w.WriteValue($"LocalizedString:{ls.Key}:{text}");
+            w.WriteStartObject();
+            w.WritePropertyName("Type");
+            w.WriteValue("LocalizedString");
+            w.WritePropertyName("Key");
+            w.WriteValue(ls.Key);
+            w.WritePropertyName("Text");
+            w.WriteValue(text);
+            w.WriteEndObject();
         }
 
         public override object ReadJson(JsonReader reader, Type type, object existing, JsonSerializer serializer)
@@ -27,15 +34,14 @@ namespace CustomBlueprints
             {
                 return null;
             }
-            if(text.StartsWith("LocalizedString") || text.StartsWith("CustomString"))
+            if (text.StartsWith("LocalizedString") || text.StartsWith("CustomString"))
             {
                 var parts = text.Split(':');
                 if (parts.Length < 2) return null;
                 var localizedString = new LocalizedString();
                 Traverse.Create(localizedString).Field("m_Key").SetValue(parts[1]);
                 return localizedString;
-            }
-            else
+            } else
             {
                 var localizedString = new LocalizedString();
                 Traverse.Create(localizedString).Field("m_Key").SetValue(text);

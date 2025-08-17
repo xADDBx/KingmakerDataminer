@@ -14,7 +14,14 @@ namespace CustomBlueprints
             var resource = (WeakResourceLink)o;
             string path = null;
             ResourcesLibrary.LibraryObject.ResourceNamesByAssetId.TryGetValue(resource.AssetId, out path);
-            w.WriteValue(string.Format($"Resource:{resource.AssetId}:{path ?? "NULL"}"));
+            w.WriteStartObject();
+            w.WritePropertyName("Type");
+            w.WriteValue("Resource");
+            w.WritePropertyName("AssetId");
+            w.WriteValue(resource.AssetId);
+            w.WritePropertyName("Path");
+            w.WriteValue(path);
+            w.WriteEndObject();
         }
         public override object ReadJson(JsonReader reader, Type type, object existing, JsonSerializer serializer)
         {

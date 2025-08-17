@@ -6,5 +6,5 @@
   "ManagerVersion": "0.14.1",
   "Requirements": [],
   "AssemblyName": "KingmakerDataminer.dll",
-  "EntryMethod": "KingmakerDataminer.Main.Load"
+  "EntryMethod": "CustomBlueprints.Main.Load"
 }

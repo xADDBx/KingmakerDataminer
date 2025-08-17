@@ -24,14 +24,14 @@ namespace CustomBlueprints
                     JsonSerializer jsonSerializer = JsonSerializer.Create(DefaultJsonSettings.DefaultSettings);
                     using (StreamReader streamReader = new StreamReader(path))
                     {
-                            LocalizationPack localizationPack = null;
-                            using (JsonTextReader jsonTextReader = new JsonTextReader(streamReader))
-                            {
-                                localizationPack = jsonSerializer.Deserialize<LocalizationPack>(jsonTextReader);
-                                localizationPack.Locale = locale;
-                            }
-                            //Main.DebugLog("Loaded localization pack " + locale);
-                            return localizationPack;
+                        LocalizationPack localizationPack = null;
+                        using (JsonTextReader jsonTextReader = new JsonTextReader(streamReader))
+                        {
+                            localizationPack = jsonSerializer.Deserialize<LocalizationPack>(jsonTextReader);
+                            localizationPack.Locale = locale;
+                        }
+                        //Main.DebugLog("Loaded localization pack " + locale);
+                        return localizationPack;
                     }
                 }
                 catch (Exception ex)
@@ -48,11 +48,11 @@ namespace CustomBlueprints
             var pack = new LocalizationPack();
             pack.Locale = locale;
             pack.Strings = new Dictionary<string, string>(LocalizationManager.CurrentPack.Strings);
-            foreach(var dialog in ResourcesLibrary.GetBlueprints<BlueprintDialog>())
+            foreach (var dialog in ResourcesLibrary.GetBlueprints<BlueprintDialog>())
             {
                 var dialogPack = LoadPack($"Localization/{locale}{dialog.AssetGuid}.json", locale);
                 if (dialogPack == null) continue;
-                foreach(var kv in dialogPack.Strings)
+                foreach (var kv in dialogPack.Strings)
                 {
                     pack.Strings[kv.Key] = kv.Value;
                 }
@@ -65,7 +65,7 @@ namespace CustomBlueprints
             if (Pack == null) Init(LocalizationManager.CurrentLocale);
             if (string.IsNullOrEmpty(key))
             {
-                return string.Empty;
+                return null;
             }
             return Pack.GetText(key);
         }

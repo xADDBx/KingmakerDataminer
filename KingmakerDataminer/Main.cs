@@ -1,14 +1,10 @@
-﻿using UnityEngine;
-using Harmony12;
-using UnityModManagerNet;
-using System.Reflection;
-using System;
-using UnityEngine.SceneManagement;
+﻿using Kingmaker;
 using Kingmaker.Blueprints;
 using Kingmaker.Visual.CharacterSystem;
-using Kingmaker.Blueprints.CharGen;
+using System;
 using System.IO;
-using Kingmaker;
+using UnityEngine;
+using UnityModManagerNet;
 
 namespace CustomBlueprints
 {
@@ -21,7 +17,7 @@ namespace CustomBlueprints
         [System.Diagnostics.Conditional("DEBUG")]
         public static void DebugLog(string msg)
         {
-            if(logger != null) logger.Log(msg);
+            if (logger != null) logger.Log(msg);
         }
         public static bool enabled;
         public static Settings settings;
@@ -40,8 +36,9 @@ namespace CustomBlueprints
                 ModPath = modEntry.Path;
                 logger = new UMMLogger(modEntry.Logger);
             }
-            catch (Exception e){
-                modEntry.Logger.Log(e.ToString() +"\n" + e.StackTrace);
+            catch (Exception e)
+            {
+                modEntry.Logger.Log(e.ToString() + "\n" + e.StackTrace);
             }
             return true;
         }
@@ -75,7 +72,8 @@ namespace CustomBlueprints
                 {
                     AssetsDump.DumpQuick();
                 }
-                if (GUILayout.Button("DumpSampleOfBlueprints")){
+                if (GUILayout.Button("DumpSampleOfBlueprints"))
+                {
                     AssetsDump.DumpBlueprints();
                 }
                 if (GUILayout.Button("DumpAllBlueprints"))
@@ -145,8 +143,13 @@ namespace CustomBlueprints
                     var character = view.GetComponent<Character>();
                     JsonBlueprints.Dump(character, "adf003833b2463543a065d5160c7e8f1");
                 }
+                if (GUILayout.Button("Dump Dialogs Structured"))
+                {
+                    AssetsDump.DumpDialogsStrctured();
+                }
 #endif
-            } catch(Exception e)
+            }
+            catch (Exception e)
             {
                 DebugLog(e.ToString() + " " + e.StackTrace);
             }

@@ -5,19 +5,21 @@ using Kingmaker.Blueprints.Classes;
 using Kingmaker.Blueprints.Classes.Selection;
 using Kingmaker.Blueprints.Classes.Spells;
 using Kingmaker.Blueprints.Items.Weapons;
+using Kingmaker.DialogSystem;
+using Kingmaker.DialogSystem.Blueprints;
 using Kingmaker.Kingdom;
 using Kingmaker.UnitLogic.Buffs.Blueprints;
 using Kingmaker.Utility;
 using Kingmaker.View;
 using Kingmaker.Visual.CharacterSystem;
+using Kingmaker.Visual.Critters;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
-using Kingmaker.Visual.Critters;
 using UnityEngine.SceneManagement;
-using Newtonsoft.Json;
 
 namespace CustomBlueprints
 {
@@ -310,7 +312,7 @@ namespace CustomBlueprints
         public static void DumpSceneList()
         {
             string result = "";
-            for(int i = 0; i < SceneManager.sceneCountInBuildSettings; i++)
+            for (int i = 0; i < SceneManager.sceneCountInBuildSettings; i++)
             {
                 var scenePath = SceneUtility.GetScenePathByBuildIndex(i);
                 var scene = SceneManager.GetSceneByBuildIndex(i);
@@ -318,6 +320,87 @@ namespace CustomBlueprints
             }
             Directory.CreateDirectory("Dump");
             File.WriteAllText("Dump/SceneList.txt", result);
+        }
+
+        public static void dumpAnswer(BlueprintAnswerBase answer, HashSet<object> dumpList)
+        {
+            if (dumpList.Contains(answer)) return;
+            dumpList.Add(answer);
+            if (answer is BlueprintAnswer banswer)
+            {
+                dumpCueSelection(banswer.NextCue, dumpList);
+            } else if (answer is BlueprintAnswersList bal)
+            {
+                foreach (var newAnswer in bal.Answers)
+                {
+                    dumpAnswer(newAnswer, dumpList);
+                }
+            }
+        }
+        public static void dumpCue(BlueprintCueBase cue, HashSet<object> dumpList)
+        {
+            if (dumpList.Contains(cue)) return;
+            dumpList.Add(cue);
+            if (cue is BlueprintCue bcue)
+            {
+                foreach (BlueprintAnswerBase answer in bcue.Answers)
+                {
+                    dumpAnswer(answer, dumpList);
+                }
+                dumpCueSelection(bcue.Continue, dumpList);
+            } else if (cue is BlueprintCueSequence bcs)
+            {
+                foreach (var newCue in bcs.Cues)
+                {
+                    dumpCue(newCue, dumpList);
+                }
+            } else if (cue is BlueprintCheck bc)
+            {
+                // Useless
+            } else if (cue is BlueprintBookPage bbp)
+            {
+                foreach (var answer in bbp.Answers)
+                {
+                    dumpAnswer(answer, dumpList);
+                }
+                foreach (var newCue in bbp.Cues)
+                {
+                    dumpCue(newCue, dumpList);
+                }
+            }
+        }
+        public static void dumpCueSelection(CueSelection cs, HashSet<object> dumpList)
+        {
+            if (dumpList.Contains(cs)) return;
+            dumpList.Add(cs);
+            foreach (var cue in cs.Cues)
+            {
+                dumpCue(cue, dumpList);
+            }
+        }
+        public static void DumpDialogsStrctured()
+        {
+            var blueprints = ResourcesLibrary.GetBlueprints<BlueprintDialog>().ToList();
+            foreach (var dialog in blueprints)
+            {
+                Directory.CreateDirectory("Blueprints");
+                JsonBlueprints.Dump(dialog, $"Blueprints/Dialog/{dialog?.name ?? "????"}/{dialog?.name} ({dialog?.AssetGuid}).json", null);
+                HashSet<object> dumpSet = new HashSet<object>();
+                dumpCueSelection(dialog.FirstCue, dumpSet);
+                foreach (var bp in dumpSet)
+                {
+                    if (bp is BlueprintScriptableObject bsc)
+                    {
+                        JsonBlueprints.Dump(bp, $"Blueprints/Dialog/{dialog?.name ?? "????"}/{bp?.GetType()}/{bsc?.name} ({bsc?.AssetGuid}).json", null);
+                    } else if (bp is CueSelection cs)
+                    {
+                        JsonBlueprints.Dump(bp, $"Blueprints/Dialog/{dialog?.name ?? "????"}/{bp?.GetType()}/{cs.GetHashCode()}.json", null);
+                    } else
+                    {
+                        JsonBlueprints.Dump(bp, $"Blueprints/Dialog/{dialog?.name ?? "????"}/{bp?.GetType()}/{bp.GetHashCode()}.json", null);
+                    }
+                }
+            }
         }
     }
 }
