@@ -39,7 +39,7 @@ namespace CustomBlueprints
                 w.WritePropertyName("Type");
                 w.WriteValue("Blueprint");
                 w.WritePropertyName("AssetId");
-                w.WriteValue(bp.AssetGuid);
+                w.WriteValue("!bp_" + bp.AssetGuid);
                 w.WritePropertyName("Name");
                 w.WriteValue(bp.name);
                 w.WriteEndObject();
