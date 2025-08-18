@@ -18,6 +18,8 @@ namespace CustomBlueprints
             }
             var text = LocalizationHelper.GetText(ls.Key);
             w.WriteStartObject();
+            w.WritePropertyName("Type");
+            w.WriteValue("LocalizedString");
             w.WritePropertyName("Key");
             w.WriteValue(ls.Key);
             w.WritePropertyName("Text");
