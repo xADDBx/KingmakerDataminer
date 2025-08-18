@@ -35,14 +35,7 @@ namespace CustomBlueprints
                 {
                     bp = (BlueprintScriptableObject)o;
                 }
-                w.WriteStartObject();
-                w.WritePropertyName("Type");
-                w.WriteValue("Blueprint");
-                w.WritePropertyName("AssetId");
                 w.WriteValue("!bp_" + bp.AssetGuid);
-                w.WritePropertyName("Name");
-                w.WriteValue(bp.name);
-                w.WriteEndObject();
             }
             catch (InvalidCastException ex)
             {
